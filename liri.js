@@ -16,22 +16,24 @@ var keys = require("./keys.js");
 //Global Variables
 var client = new Twitter(keys.twitter);
 var spotify = new Spotify(keys.spotify);
+var input = process.argv[2];
 
 //Functions
 myTweets = () => {
+    /*TODO*/
     //Function that shows the last 20 tweets and when they were created to terminal/bash
     var param = {
-        q: "#node.js",
+        name: "RougeZero",
         count: 20,
-        result_type: "recent"
     };
     //Twitter test code
-    client.get('search/tweets', param, function(error, tweets, response){
+    client.get('statuses/user_timeline', param, function(error, tweets, response){
         if(error){
             console.log(error);
         }
-        console.log(tweets);
-        //console.log(tweets.text);
+        //TODO: make for look to loop through tweets
+        console.log(tweets[0].created_at);
+        console.log(tweets[0].text);
         //console.log(response);
     });
 }
@@ -39,7 +41,7 @@ myTweets = () => {
 getSong = () => {
     //Function determines what song to look up
     if(process.argv.length < 4){
-        var songName = "The Sign Ace of Base";
+        var songName = "The Sign, Ace of Base";
         songInfo(songName);
     }
     else{
@@ -102,7 +104,6 @@ movieInfo = (movieName) => {
     });
 }
 
-var input = process.argv[2];
 switch(input){
     case "my-tweets":
         myTweets();
