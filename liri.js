@@ -54,7 +54,6 @@ songInfo = (songName) => {
             console.log("Error occurred: " + err);
         }
         else{
-            console.log(JSON.stringify(data,null,2));
             if(data.tracks.items.length > 0){
                 var info = data.tracks.items[0];
                 console.log(`Artist(s): ${info.artists[0].name}\nTrack: ${info.name}`);
