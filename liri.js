@@ -39,22 +39,22 @@ myTweets = () => {
 getSong = () => {
     //Function determines what song to look up
     if(process.argv.length < 4){
-        var songName = "The Sign";
-        var artistName = "Ace of Base"
-        songInfo(songName, artistName);
+        var songName = "The Sign Ace of Base";
+        songInfo(songName);
     }
     else{
         var songName = process.argv[3];
         songInfo(songName);
     }
 }
-songInfo = (songName, artistName) => {
+songInfo = (songName) => {
     //Function request to Spotify API and displays information: Artist, Song name, Preview link, Album.
     spotify.search({type: 'track', query: songName, limit: 1}, function(err,data){
         if(err){
             console.log("Error occurred: " + err);
         }
         else{
+            console.log(JSON.stringify(data,null,2));
             if(data.tracks.items.length > 0){
                 var info = data.tracks.items[0];
                 console.log(`Artist(s): ${info.artists[0].name}\nTrack: ${info.name}`);
