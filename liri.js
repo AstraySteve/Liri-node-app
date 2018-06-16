@@ -16,70 +16,61 @@ var keys = require("./keys.js");
 //Global Variables
 var client = new Twitter(keys.twitter);
 var spotify = new Spotify(keys.spotify);
-var input = process.argv[2];
+var input = process.argv.slice(2);
 
 //Functions
 myTweets = () => {
-    /*TODO*/
     //Function that shows the last 20 tweets and when they were created to terminal/bash
     var param = {
-        name: "RougeZero",
+        name: 'RougeZero',
         count: 20,
     };
-    //Twitter test code
     client.get('statuses/user_timeline', param, function(error, tweets, response){
         if(error){
             console.log(error);
         }
-        //TODO: make for look to loop through tweets
-        console.log(tweets[0].created_at);
-        console.log(tweets[0].text);
+        for (var i=0; i<tweets.length; i++){
+            console.log(tweets[i].created_at);
+            console.log(tweets[i].text);
+            console.log("----------------------");
+        }
         //console.log(response);
     });
 }
 
-getSong = () => {
-    //Function determines what song to look up
-    if(process.argv.length < 4){
-        var songName = "The Sign, Ace of Base";
-        songInfo(songName);
-    }
-    else{
-        var songName = process.argv[3];
-        songInfo(songName);
-    }
-}
 songInfo = (songName) => {
-    //Function request to Spotify API and displays information: Artist, Song name, Preview link, Album.
+    /*Function request to Spotify API and displays the following info:
+      Artist, Song name, Preview link, Album.*/
+    if(songName == null){
+        songName = "The Sign, Ace of Base";
+    }
     spotify.search({type: 'track', query: songName, limit: 1}, function(err,data){
         if(err){
             console.log("Error occurred: " + err);
         }
         else{
             if(data.tracks.items.length > 0){
+                //Song found
                 var info = data.tracks.items[0];
                 console.log(`Artist(s): ${info.artists[0].name}\nTrack: ${info.name}`);
                 console.log(`Preview: ${info.preview_url}\nAlbum: ${info.album.name}`);
             }
             else{
+                //Song not found
                 console.log("Song not found!");
             }
         }
     });
 }
 
-getMovie = () => {
+getMovie = (movieName) => {
     //Function determines what movie to look up
-    if (process.argv.length < 4){
-        var movieName = "Mr. Nobody";
+    if (movieName == null){
+        movieName = "Mr. Nobody";
         console.log("If you haven't watched 'Mr. Nobody.' then you should: http://www.imdb.com/title/tt0485947/");
         console.log("It's on Netflix!");
-        movieInfo(movieName);
     }
-    else{
-        var movieName = process.argv[3];
-        movieInfo(movieName);
-    }
+    movieInfo(movieName);
 }
 movieInfo = (movieName) => {
     /*Function will request to OMDB and output the following info: Title, Year of release, IMDB rating,
@@ -104,20 +95,36 @@ movieInfo = (movieName) => {
     });
 }
 
-switch(input){
-    case "my-tweets":
-        myTweets();
-        break;
-    case "spotify-this-song":
-        getSong();
-        break;
-    case "movie-this":
-        getMovie();
-        break;
-    case "do-what-it-says":
-        //something
-        break;
-    default:
-        console.log("invalid command!");
+randomCommand = () => {
+    //Function takes the text inside of random.txt and then use it to call one of LIRI's commands.
+    fs.readFile("random.txt", "utf8", function(error, data) {
+        if (error) {
+          return console.log(error);
+        }
+        /*TODO make random truly random*/
+        var dataArgs = data.split(',');
+        //console.log(dataArgs); //DEBUG CODE
+        liriMain(dataArgs);
+    });
 }
 
+liriMain = (command) => {
+    switch(command[0]){
+        case "my-tweets":
+            myTweets();
+            break;
+        case "spotify-this-song":
+            songInfo(command[1]);
+            break;
+        case "movie-this":
+            getMovie(command[1]);
+            break;
+        case "do-what-it-says":
+            randomCommand();
+            break;
+        default:
+            console.log("invalid command!");
+    }
+}
+
+liriMain(input);
