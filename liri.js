@@ -28,11 +28,12 @@ myTweets = () => {
     client.get('statuses/user_timeline', param, function(error, tweets, response){
         if(error){
             console.log(error);
+            updateLog(error);
         }
         for (var i=0; i<tweets.length; i++){
-            console.log(tweets[i].created_at);
-            console.log(tweets[i].text);
-            console.log("----------------------");
+            var post = `${tweets[i].created_at}\n${tweets[i].text}\n----------------------`
+            console.log(post);
+            updateLog(post);
         }
         //console.log(response);
     });
@@ -47,6 +48,7 @@ songInfo = (songName) => {
     spotify.search({type: 'track', query: songName, limit: 1}, function(err,data){
         if(err){
             console.log("Error occurred: " + err);
+            updateLog("Error occurred: " + err);
         }
         else{
             if(data.tracks.items.length > 0){
@@ -54,10 +56,12 @@ songInfo = (songName) => {
                 var info = data.tracks.items[0];
                 console.log(`Artist(s): ${info.artists[0].name}\nTrack: ${info.name}`);
                 console.log(`Preview: ${info.preview_url}\nAlbum: ${info.album.name}`);
+                updateLog(`Artist(s): ${info.artists[0].name}\nTrack: ${info.name}\nPreview: ${info.preview_url}\nAlbum: ${info.album.name}`);
             }
             else{
                 //Song not found
                 console.log("Song not found!");
+                updateLog("Song not found!")
             }
         }
     });
@@ -67,8 +71,9 @@ getMovie = (movieName) => {
     //Function determines what movie to look up
     if (movieName == null){
         movieName = "Mr. Nobody";
-        console.log("If you haven't watched 'Mr. Nobody.' then you should: http://www.imdb.com/title/tt0485947/");
-        console.log("It's on Netflix!");
+        var output =`If you haven't watched 'Mr. Nobody.' then you should: http://www.imdb.com/title/tt0485947/\nIt's on Netflix!`;
+        console.log(output);
+        updateLog(output);
     }
     movieInfo(movieName);
 }
@@ -86,10 +91,12 @@ movieInfo = (movieName) => {
                 console.log(`Title: ${info.Title}\nYear: ${info.Year}\nIMDB Rating: ${info.Ratings[0].Value}`);
                 console.log(`Rotten Tomatoes Rating: ${info.Ratings[1].Value}\nCountry: ${info.Country}\nLanguage: ${info.Language}`);
                 console.log(`Plot: ${info.Plot}\nActors: ${info.Actors}`);
+                updateLog(`Title: ${info.Title}\nYear: ${info.Year}\nIMDB Rating: ${info.Ratings[0].Value}\nRotten Tomatoes Rating: ${info.Ratings[1].Value}\nCountry: ${info.Country}\nLanguage: ${info.Language}\nPlot: ${info.Plot}\nActors: ${info.Actors}`);
             }
             else{
                 //Movie not found
                 console.log(info.Error);
+                updateLog(info.Error);
             }
         }
     });
@@ -104,8 +111,23 @@ randomCommand = () => {
         /*TODO make random truly random*/
         var dataArgs = data.split(',');
         //console.log(dataArgs); //DEBUG CODE
+        updateLog(`command ${dataArgs}`);
         liriMain(dataArgs);
     });
+}
+
+updateLog = (data, isCommand = false) => {
+    //Function that writes to a file a record of inputted commands and outputted data to log.txt
+    if (isCommand){
+        data = `\nnode liri.js ${data}\n`;
+    }
+    var log = (`\n${data}`);
+    fs.appendFile("log.txt", log, function(err) {
+        // If an error was experienced we say it.
+        if (err) {
+          console.log(err);
+        }
+      });
 }
 
 liriMain = (command) => {
@@ -127,4 +149,5 @@ liriMain = (command) => {
     }
 }
 
+updateLog(input.join(), true);
 liriMain(input);
