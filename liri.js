@@ -22,7 +22,6 @@ var input = process.argv.slice(2);
 myTweets = () => {
     //Function that shows the last 20 tweets and when they were created to terminal/bash
     var param = {
-        name: 'RougeZero',
         count: 20,
     };
     client.get('statuses/user_timeline', param, function(error, tweets, response){
